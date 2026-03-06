@@ -1,8 +1,9 @@
 Bersihin 🧼
 
-"License" (https://img.shields.io/github/license/baska-id/bersihin)
-"Platform" (https://img.shields.io/badge/platform-Termux-black)
-"Shell" (https://img.shields.io/badge/language-Bash-blue)
+
+![License](https://img.shields.io/badge/license-MIT-green)
+![Platform](https://img.shields.io/badge/platform-Termux-black)
+![Shell](https://img.shields.io/badge/language-Bash-blue)
 
 Bersihin adalah tool CLI sederhana untuk membersihkan cache dan file sementara di Termux, sehingga storage tetap ringan dan lingkungan development tetap rapi.
 
