@@ -1,4 +1,4 @@
-#!/data/data/com.termux/files/usr/bin/bash
+#!/usr/bin/env bash
 
 # --- Konfigurasi Warna ---
 C_RES="\e[0m"; C_RED="\e[1;31m"; C_YEL="\e[1;33m"; C_GRN="\e[1;32m"; C_CYN="\e[1;36m"
@@ -24,8 +24,13 @@ if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
     exit 0
 fi
 
+# --- Deteksi lingkungan ---
+IS_TERMUX=false
+if [[ -d "/data/data/com.termux" ]] || [[ -n "$PREFIX" ]]; then
+    IS_TERMUX=true
+fi
+
 INSTALL_DIR="$HOME/.bersihin"
-BIN_FILE="$PREFIX/bin/bersihin"
 
 echo -e "\n${C_CYN}Sedang membersihkan sistem...${C_RES}"
 
@@ -35,12 +40,22 @@ if [ -d "$INSTALL_DIR" ]; then
     echo -e "${C_GRN}[+]${C_RES} Folder internal dihapus."
 fi
 
-if [ -L "$BIN_FILE" ] || [ -f "$BIN_FILE" ]; then
-    rm -f "$BIN_FILE"
-    echo -e "${C_GRN}[+]${C_RES} Shortcut perintah dihapus."
+# Hapus symlink dari berbagai kemungkinan lokasi
+if $IS_TERMUX; then
+    if [ -L "$PREFIX/bin/bersihin" ] || [ -f "$PREFIX/bin/bersihin" ]; then
+        rm -f "$PREFIX/bin/bersihin"
+        echo -e "${C_GRN}[+]${C_RES} Shortcut dihapus dari $PREFIX/bin."
+    fi
+else
+    for loc in "/usr/local/bin/bersihin" "$HOME/.local/bin/bersihin"; do
+        if [ -L "$loc" ] || [ -f "$loc" ]; then
+            rm -f "$loc"
+            echo -e "${C_GRN}[+]${C_RES} Shortcut dihapus dari $loc."
+        fi
+    done
 fi
 
 # Deep Clean: Hapus file log/cache yang mungkin dibuat oleh script
 rm -f "$HOME/.bersihin_history" 2>/dev/null
 
-echo -e "\n${C_GRN}✅ 'bersihin' telah dihapus sepenuhnya dari Termux.${C_RES}"
+echo -e "\n${C_GRN}✅ 'bersihin' telah dihapus sepenuhnya.${C_RES}"
