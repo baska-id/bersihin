@@ -6,6 +6,7 @@
 
 INSTALL_DIR="$HOME/.bersihin"
 SCRIPT_PATH="$INSTALL_DIR/bersihin.sh"
+BIN_FILE="$PREFIX/bin/bersihin"
 REPO_URL="https://raw.githubusercontent.com/baska-id/bersihin/main/bersihin.sh"
 
 # --- KOSMETIK: Konfigurasi Warna ---
@@ -45,7 +46,6 @@ update_script() {
     info "Mengunduh pembaruan dari server..."
     mkdir -p "$INSTALL_DIR"
     
-    # Download ke file temporary dulu agar aman jika internet putus di tengah jalan
     if curl -fsSL "$REPO_URL" -o "$SCRIPT_PATH.tmp"; then
         mv "$SCRIPT_PATH.tmp" "$SCRIPT_PATH"
         chmod +x "$SCRIPT_PATH"
@@ -55,6 +55,23 @@ update_script() {
         rm -f "$SCRIPT_PATH.tmp"
     fi
     exit 0
+}
+
+# --- FUNGSI UNINSTALL (FITUR BARU) ---
+uninstall_script() {
+    banner
+    echo -e "${C_RED}⚠️  PERINGATAN: Kamu akan menghapus Bersihin dari sistem.${C_RES}"
+    read -p "Apakah kamu yakin? (y/n): " konfirmasi
+    if [[ "$konfirmasi" == "y" || "$konfirmasi" == "Y" ]]; then
+        info "Menghapus file dan shortcut..."
+        rm -rf "$INSTALL_DIR"
+        rm -f "$BIN_FILE"
+        sukses "Bersihin telah berhasil dihapus."
+        exit 0
+    else
+        info "Penghapusan dibatalkan."
+        exit 0
+    fi
 }
 
 clean_apt() {
@@ -67,14 +84,12 @@ clean_apt() {
 clean_langs() {
     info "Membersihkan cache bahasa pemrograman..."
     
-    # Python
     if command -v pip > /dev/null 2>&1; then
         pip cache purge > /dev/null 2>&1
         find ~ -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null
         sukses "Python (pip & pycache) bersih."
     fi
 
-    # NodeJS
     if command -v npm > /dev/null 2>&1; then
         npm cache clean --force > /dev/null 2>&1
         sukses "NodeJS (npm cache) bersih."
@@ -84,7 +99,6 @@ clean_langs() {
         sukses "Yarn cache bersih."
     fi
 
-    # Go
     if command -v go > /dev/null 2>&1; then
         go clean -cache > /dev/null 2>&1
         sukses "Go cache bersih."
@@ -94,7 +108,6 @@ clean_langs() {
 clean_system() {
     info "Membersihkan temporary files & system cache..."
     
-    # Daftar folder aman untuk dibersihkan
     TMP_DIRS=(
         "$HOME/.cache"
         "/data/data/com.termux/cache"
@@ -104,12 +117,10 @@ clean_system() {
 
     for dir in "${TMP_DIRS[@]}"; do
         if [ -d "$dir" ]; then
-            # Parameter ${dir:?} mencegah bencana (mencegah command menjadi rm -rf /*)
             rm -rf "${dir:?}"/* 2>/dev/null
         fi
     done
 
-    # Bersihkan isi log yang menumpuk tanpa menghapus file utamanya
     find /data/data/com.termux/files/usr/var/log -type f -name "*.log" -exec truncate -s 0 {} + 2>/dev/null
     
     sukses "System Temp & Log bersih."
@@ -117,15 +128,16 @@ clean_system() {
 
 show_help() {
     banner
-    echo -e "Penggunaan: ${C_YEL}bersihin.sh [OPSI]${C_RES}"
-    echo -e "Tanpa opsi, script akan menjalankan pembersihan menyeluruh secara otomatis."
+    echo -e "Penggunaan: ${C_YEL}bersihin [OPSI]${C_RES}"
+    echo -e "Tanpa opsi, script akan menjalankan pembersihan menyeluruh."
     echo -e ""
     echo -e "Opsi yang tersedia:"
-    echo -e "  ${C_GRN}--apt${C_RES}       Membersihkan cache paket instalasi (APT) saja"
-    echo -e "  ${C_GRN}--lang${C_RES}      Membersihkan cache bahasa pemrograman (Python, Node, Go)"
-    echo -e "  ${C_GRN}--sys${C_RES}       Membersihkan file temporary dan file log"
-    echo -e "  ${C_GRN}--update${C_RES}    Memperbarui script ini dari GitHub"
-    echo -e "  ${C_GRN}--help${C_RES}      Menampilkan halaman bantuan ini"
+    echo -e "  ${C_GRN}--apt${C_RES}         Membersihkan cache paket (APT)"
+    echo -e "  ${C_GRN}--lang${C_RES}        Membersihkan cache (Python, Node, Go)"
+    echo -e "  ${C_GRN}--sys${C_RES}         Membersihkan file temporary & log"
+    echo -e "  ${C_GRN}--update${C_RES}      Memperbarui script dari GitHub"
+    echo -e "  ${C_GRN}--uninstall${C_RES}   Menghapus script dari sistem"
+    echo -e "  ${C_GRN}--help${C_RES}        Menampilkan halaman bantuan"
     echo -e ""
     exit 0
 }
@@ -135,6 +147,9 @@ case "$1" in
     --update)
         banner
         update_script
+        ;;
+    --uninstall)
+        uninstall_script
         ;;
     --apt)
         banner
@@ -153,14 +168,12 @@ case "$1" in
         ;;
     "")
         banner
-        # Cek sisa storage sebelum pembersihan
         SPACE_BEFORE=$(get_free_space)
         
         clean_apt
         clean_langs
         clean_system
 
-        # Cek sisa storage setelah pembersihan
         SPACE_AFTER=$(get_free_space)
         SAVED_KB=$((SPACE_AFTER - SPACE_BEFORE))
         
@@ -169,13 +182,13 @@ case "$1" in
             SAVED_MB=$(awk "BEGIN {printf \"%.2f\", $SAVED_KB/1024}")
             sukses "Selesai! Berhasil menghemat memori sebesar ${C_YEL}${SAVED_MB} MB${C_RES}."
         else
-            sukses "Selesai! Sistem Termux kamu sebelumnya memang sudah sangat bersih."
+            sukses "Selesai! Sistem Termux kamu sudah bersih."
         fi
         echo -e "📅 Waktu: $(date)"
         ;;
     *)
         gagal "Opsi '$1' tidak dikenali."
-        echo "Ketik 'bersihin.sh --help' untuk melihat panduan."
+        echo "Ketik 'bersihin --help' untuk melihat panduan."
         exit 1
         ;;
 esac
