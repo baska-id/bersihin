@@ -1,7 +1,10 @@
 Bersihin 🧼
 
-Simple Termux cleanup tool to remove cache, temporary files, and unnecessary data.
-Designed to keep your Termux environment lightweight and tidy.
+"License" (https://img.shields.io/badge/license-MIT-green)
+"Platform" (https://img.shields.io/badge/platform-Termux-black)
+"Shell" (https://img.shields.io/badge/language-Bash-blue)
+
+Bersihin adalah tool CLI sederhana untuk membersihkan cache dan file sementara di Termux, sehingga storage tetap ringan dan lingkungan development tetap rapi.
 
 ---
 
@@ -13,19 +16,19 @@ Designed to keep your Termux environment lightweight and tidy.
 - Remove temporary files
 - Delete Python "__pycache__" folders
 - Fast and lightweight
-- Works directly from Termux CLI
+- Designed specifically for Termux
 
 ---
 
 📦 Installation
 
-Method 1 — Quick Install (Recommended)
+Quick Install (Recommended)
 
 curl -sL https://raw.githubusercontent.com/baska-id/bersihin/main/install.sh | bash
 
 ---
 
-Method 2 — Manual Install
+Manual Install
 
 git clone https://github.com/baska-id/bersihin
 cd bersihin
@@ -35,11 +38,11 @@ bash install.sh
 
 🚀 Usage
 
-Run the cleaner:
+Menjalankan pembersihan:
 
 bersihin
 
-Example output:
+Contoh output:
 
 🧼 Mulai bersih-bersih Termux...
 Cleaning pip cache...
@@ -51,15 +54,15 @@ Removing temporary files...
 
 🗑 Uninstall
 
-Remove the tool from your system:
+Untuk menghapus tool dari sistem:
 
 bersihin --uninstall
 
 ---
 
-📁 What Gets Cleaned
+📁 Clean Targets
 
-The tool removes cache and temporary files from:
+Tool ini membersihkan:
 
 - "pip cache"
 - "apt cache"
@@ -67,15 +70,18 @@ The tool removes cache and temporary files from:
 - "/data/data/com.termux/cache"
 - "/data/data/com.termux/files/usr/tmp"
 - "/data/data/com.termux/files/tmp"
-- Python "__pycache__" folders
+- Python "__pycache__" directories
 
 ---
 
-⚠️ Notes
+📂 Project Structure
 
-- This tool is designed specifically for Termux environments.
-- Safe cleanup operations only remove temporary or cache files.
-- Always ensure no important process is running before cleaning.
+bersihin
+├── bersihin.sh
+├── install.sh
+├── uninstall.sh
+├── README.md
+└── LICENSE
 
 ---
 
