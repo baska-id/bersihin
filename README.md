@@ -1,8 +1,8 @@
-# Bersihin 🧼
+Bersihin 🧼
 
-![License](https://img.shields.io/badge/license-MIT-green)
-![Platform](https://img.shields.io/badge/platform-Termux-black)
-![Shell](https://img.shields.io/badge/language-Bash-blue)
+"License" (https://img.shields.io/github/license/baska-id/bersihin)
+"Platform" (https://img.shields.io/badge/platform-Termux-black)
+"Shell" (https://img.shields.io/badge/language-Bash-blue)
 
 Bersihin adalah tool CLI sederhana untuk membersihkan cache dan file sementara di Termux, sehingga storage tetap ringan dan lingkungan development tetap rapi.
 
@@ -48,7 +48,16 @@ Contoh output:
 Cleaning pip cache...
 Cleaning apt cache...
 Removing temporary files...
+Removing Python cache...
 ✅ Selesai auto-cleanup
+
+---
+
+🔄 Update
+
+Jika tersedia versi terbaru, update dengan:
+
+bersihin --update
 
 ---
 
@@ -64,8 +73,8 @@ bersihin --uninstall
 
 Tool ini membersihkan:
 
-- "pip cache"
-- "apt cache"
+- pip cache
+- apt cache
 - "~/.cache"
 - "/data/data/com.termux/cache"
 - "/data/data/com.termux/files/usr/tmp"
